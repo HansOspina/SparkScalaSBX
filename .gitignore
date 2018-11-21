@@ -1,27 +1,32 @@
-
-down vote
-Here's what gitignore.io suggests for Scala and sbt:
-
-# Created by https://www.gitignore.io/api/sbt,scala
-
-### SBT ###
-# Simple Build Tool
-# http://www.scala-sbt.org/release/docs/Getting-Started/Directories.html#configuring-version-control
-
-dist/*
+# sbt
+# (may want to keep parts of 'project')
+bin/
+project/
 target/
-lib_managed/
-src_managed/
-project/boot/
-project/plugins/project/
-.history
-.cache
-.lib/
+build/
 
-### Scala ###
-*.class
+# eclipse
+build
+.classpath
+.project
+.settings
+.worksheet
+
+# intellij idea
 *.log
-
-# End of https://www.gitignore.io/api/sbt,scala
-.idea
 *.iml
+*.ipr
+*.iws
+.idea
+
+# mac
+.DS_Store
+
+# other?
+.history
+.scala_dependencies
+.cache
+.cache-main
+
+#general
+*.class
