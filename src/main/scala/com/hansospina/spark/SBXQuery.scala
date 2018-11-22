@@ -1,37 +1,32 @@
 package com.hansospina.spark
 
 import java.net.URI
+import java.nio.charset.StandardCharsets
 
-import com.sun.scenario.Settings
-import org.apache.log4j.{Level, Logger}
-import org.apache.spark.SparkContext
-import org.apache.spark.sql.SparkSession
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import org.apache.commons.io.IOUtils
 import org.apache.http.HttpHeaders
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.{ContentType, StringEntity}
 import org.apache.http.impl.client.HttpClients
-import java.net.URI
-import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Paths}
-
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 
 
-object SBXQuery {
+object SBXQuery extends App {
 
 
   sealed trait Data
 
-  case class Customer(companyName: String)
+  case class Variety(varietyName: String, color: String, productGroup: String, _KEY: String)
 
-  case class Response[T](success: Boolean, error:Option[String], results: List[T])
+  case class Replacement(variety: String, replace: String)
+
+  case class NewReplace(variety: String, replace: String)
+
+  case class Response[T](success: Boolean, error: Option[String], results: List[T])
 
 
-  def loadFromSBX(): String = {
+  def loadFromSBX(query: String): String = {
     val client = HttpClients.createDefault()
     val uri = new URI(s"http://54.71.230.34/api/data/v1/row/find")
     val post = new HttpPost(uri)
@@ -40,7 +35,7 @@ object SBXQuery {
     post.addHeader(HttpHeaders.AUTHORIZATION, s"Bearer ${scala.util.Properties.envOrElse("TOKEN", "DOOM")}")
     println(post.toString)
 
-    post.setEntity(new StringEntity("{\"row_model\":\"customer\",\"domain\":\"129\",\"page\":1,\"size\":100,\"fetch\":[\"state\",\"country\",\"time_zone\",\"voucher\"]}"))
+    post.setEntity(new StringEntity(query))
 
     val resp = client.execute(post)
 
@@ -52,38 +47,55 @@ object SBXQuery {
     }
   }
 
+  def insertToSbx(query: String): Unit = {
+
+  }
+
 
   /** Our main function where the action happens */
-  def main(args: Array[String]) {
 
-    val jsonStr = parse(loadFromSBX())
+  val jsonVariety1 = parse(loadFromSBX("{\"row_model\":\"variety\",\"domain\":\"129\",\"page\":1,\"size\":1000,\"where\":[{\"ANDOR\":\"AND\",\"GROUP\":[{\"ANDOR\":\"AND\",\"VAL\":[\"618b7a0a-f638-4007-a05d-ba1f22fbad64\",\"12932620-8484-4dba-bd71-205ed8e5da22\",\"b74d7143-dba5-40aa-b6f6-7aeb89c6fce4\",\"47c397da-36d2-4e19-abac-315b05d83a9a\",\"89ea3f9d-8cb9-4ee9-958e-dc6490be0ba9\",\"f6cd25f1-8984-4888-ad4b-90038f2f3670\",\"f6c341ad-8fbd-45d4-8615-26a3caa85d97\"],\"FIELD\":\"product_group\",\"OP\":\"not in\"}]}]}"))
+  val jsonVariety2 = parse(loadFromSBX("{\"row_model\":\"variety\",\"domain\":\"129\",\"page\":2,\"size\":1000,\"where\":[{\"ANDOR\":\"AND\",\"GROUP\":[{\"ANDOR\":\"AND\",\"VAL\":[\"618b7a0a-f638-4007-a05d-ba1f22fbad64\",\"12932620-8484-4dba-bd71-205ed8e5da22\",\"b74d7143-dba5-40aa-b6f6-7aeb89c6fce4\",\"47c397da-36d2-4e19-abac-315b05d83a9a\",\"89ea3f9d-8cb9-4ee9-958e-dc6490be0ba9\",\"f6cd25f1-8984-4888-ad4b-90038f2f3670\",\"f6c341ad-8fbd-45d4-8615-26a3caa85d97\"],\"FIELD\":\"product_group\",\"OP\":\"not in\"}]}]}"))
+  val jsonVariety3 = parse(loadFromSBX("{\"row_model\":\"variety\",\"domain\":\"129\",\"page\":3,\"size\":1000,\"where\":[{\"ANDOR\":\"AND\",\"GROUP\":[{\"ANDOR\":\"AND\",\"VAL\":[\"618b7a0a-f638-4007-a05d-ba1f22fbad64\",\"12932620-8484-4dba-bd71-205ed8e5da22\",\"b74d7143-dba5-40aa-b6f6-7aeb89c6fce4\",\"47c397da-36d2-4e19-abac-315b05d83a9a\",\"89ea3f9d-8cb9-4ee9-958e-dc6490be0ba9\",\"f6cd25f1-8984-4888-ad4b-90038f2f3670\",\"f6c341ad-8fbd-45d4-8615-26a3caa85d97\"],\"FIELD\":\"product_group\",\"OP\":\"not in\"}]}]}"))
+  val jsonVariety4 = parse(loadFromSBX("{\"row_model\":\"variety\",\"domain\":\"129\",\"page\":4,\"size\":1000,\"where\":[{\"ANDOR\":\"AND\",\"GROUP\":[{\"ANDOR\":\"AND\",\"VAL\":[\"618b7a0a-f638-4007-a05d-ba1f22fbad64\",\"12932620-8484-4dba-bd71-205ed8e5da22\",\"b74d7143-dba5-40aa-b6f6-7aeb89c6fce4\",\"47c397da-36d2-4e19-abac-315b05d83a9a\",\"89ea3f9d-8cb9-4ee9-958e-dc6490be0ba9\",\"f6cd25f1-8984-4888-ad4b-90038f2f3670\",\"f6c341ad-8fbd-45d4-8615-26a3caa85d97\"],\"FIELD\":\"product_group\",\"OP\":\"not in\"}]}]}"))
+  val jsonVariety5 = parse(loadFromSBX("{\"row_model\":\"variety\",\"domain\":\"129\",\"page\":5,\"size\":1000,\"where\":[{\"ANDOR\":\"AND\",\"GROUP\":[{\"ANDOR\":\"AND\",\"VAL\":[\"618b7a0a-f638-4007-a05d-ba1f22fbad64\",\"12932620-8484-4dba-bd71-205ed8e5da22\",\"b74d7143-dba5-40aa-b6f6-7aeb89c6fce4\",\"47c397da-36d2-4e19-abac-315b05d83a9a\",\"89ea3f9d-8cb9-4ee9-958e-dc6490be0ba9\",\"f6cd25f1-8984-4888-ad4b-90038f2f3670\",\"f6c341ad-8fbd-45d4-8615-26a3caa85d97\"],\"FIELD\":\"product_group\",\"OP\":\"not in\"}]}]}"))
+  val jsonVariety6 = parse(loadFromSBX("{\"row_model\":\"variety\",\"domain\":\"129\",\"page\":6,\"size\":1000,\"where\":[{\"ANDOR\":\"AND\",\"GROUP\":[{\"ANDOR\":\"AND\",\"VAL\":[\"618b7a0a-f638-4007-a05d-ba1f22fbad64\",\"12932620-8484-4dba-bd71-205ed8e5da22\",\"b74d7143-dba5-40aa-b6f6-7aeb89c6fce4\",\"47c397da-36d2-4e19-abac-315b05d83a9a\",\"89ea3f9d-8cb9-4ee9-958e-dc6490be0ba9\",\"f6cd25f1-8984-4888-ad4b-90038f2f3670\",\"f6c341ad-8fbd-45d4-8615-26a3caa85d97\"],\"FIELD\":\"product_group\",\"OP\":\"not in\"}]}]}"))
+  val jsonReplacement = parse(loadFromSBX("{\"row_model\":\"replacement\",\"domain\":\"129\",\"page\":1,\"size\":1000}"))
 
-    implicit val formats: DefaultFormats.type = DefaultFormats
-    val coco = jsonStr.camelizeKeys.extract[Response[Customer]]
+  implicit val formats: DefaultFormats.type = DefaultFormats
 
+  val resVariety1 = jsonVariety1.camelizeKeys.extract[Response[Variety]].results
+  val resVariety2 = jsonVariety2.camelizeKeys.extract[Response[Variety]].results
+  val resVariety3 = jsonVariety3.camelizeKeys.extract[Response[Variety]].results
+  val resVariety4 = jsonVariety4.camelizeKeys.extract[Response[Variety]].results
+  val resVariety5 = jsonVariety5.camelizeKeys.extract[Response[Variety]].results
+  val resVariety6 = jsonVariety6.camelizeKeys.extract[Response[Variety]].results
 
-    if (coco.success) {
-      coco.results.foreach(println)
-    } else {
-      println(coco.error.getOrElse("No error but didn't work dude."))
-    }
+  val resVariety = resVariety1 ++ resVariety2 ++ resVariety3 ++ resVariety4 ++ resVariety5 ++ resVariety6
 
+  val resReplacement = jsonReplacement.camelizeKeys.extract[Response[Replacement]]
 
+  if (resReplacement.success) {
+    println(resReplacement.results)
+    val groupBy = resVariety.groupBy(a => (a.color, a.productGroup)).filter(a => a._2.size > 1)
+    val newGroup = groupBy.values.flatMap(a => {
+      val x = a.flatMap(b => {
+        var index = a.indexOf(b) + 1
+        var array: List[Replacement] = List()
+        while (index < a.size) {
+          array = new Replacement(b._KEY, a(index)._KEY) :: array
+          index += 1
+        }
+        array
+      })
+      x
+    })
+    println(newGroup.size)
 
-    // Set the log level to only print errors
-    Logger.getLogger("org").setLevel(Level.ERROR)
-
-    // Create a SparkContext using every core of the local machine, named RatingsCounter
-    val sc = new SparkContext("local[*]", "LPS Logs")
-    val spark = SparkSession
-      .builder()
-      .getOrCreate()
-    import spark.implicits._
-
-
-    sc.stop()
-
-
+    println(newGroup.filterNot(resReplacement.results.toSet).size)
+    // insertToSbx("{\"page\":1,\"size\":1000,\"domain\":\"96\",\"row_model\":\"replacement\",\"rows\":[{\"variety\":\"b78a5ae1-ffb9-4712-9328-50e2d8666439\",\"replace\":\"b78a5ae1-ffb9-4712-9328-50e2d8666439\"}]}")
+  } else {
+    println(resReplacement.error.getOrElse("No error but didn't work dude."))
   }
 
 }
